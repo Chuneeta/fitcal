@@ -8,8 +8,8 @@ Fitting the solution (amplitudes and phases) had several useful purposes, one of
 Another useful information is to the goodness of fit which would give a quality assurance metric to identify the spread/variance of the solutions. 
 
 ## Installation
-Clone the repo using \n
-`git clone https://github.com/Chuneeta/calfit.git \n`
-<`cd calfit \n`>
-<`python setup.py install`>
+Clone the repo using   
+`git clone https://github.com/Chuneeta/calfit.git`   
+`cd calfit`>  
+`python setup.py install`  
 

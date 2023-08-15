@@ -10,6 +10,6 @@ Another useful information is to the goodness of fit which would give a quality 
 ## Installation
 Clone the repo using \n
 `git clone https://github.com/Chuneeta/calfit.git \n`
-`cd calfit` \n
-`python setup.py install`\n
+<`cd calfit \n`>
+<`python setup.py install`>
 

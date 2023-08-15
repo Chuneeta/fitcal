@@ -9,7 +9,7 @@ Another useful information is to the goodness of fit which would give a quality 
 
 ## Installation
 Clone the repo using
-`git clone https://github.com/Chuneeta/calfit.git`<br>
+`git clone https://github.com/Chuneeta/calfit.git \n`
 `cd calfit`
 `python setup.py install`
 

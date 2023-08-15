@@ -1,6 +1,6 @@
 # calfit
 
-Python package to fit calibration solutions obtained from \url{Hyprdrive}{https://github.com/MWATelescope/mwa_hyperdrive}.
+Python package to fit calibration solutions obtained from [Hyprdrive](https://github.com/MWATelescope/mwa_hyperdrive).
 
 ## Motivation
 Fitting the solution (amplitudes and phases) had several useful purposes, one of those is to try to reduce noise on the calibration solution, thus attempting to reduce noise on our final data product.

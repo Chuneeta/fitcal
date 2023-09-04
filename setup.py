@@ -1,11 +1,11 @@
 from setuptools import setup
-from polyFit import version
+from fitcal import version
 import os
 import json
 
 data = [version.git_origin, version.git_hash,
 		version.git_description, version.git_branch]
-with open(os.path.join('polyFit', 'GIT_INFO'), 'w') as outfile:
+with open(os.path.join('fitcal', 'GIT_INFO'), 'w') as outfile:
 	json.dump(data, outfile)
 
 
@@ -24,19 +24,19 @@ def package_files(package_dir, subdirectory):
 data_files = package_files('polyFit', 'data')
 
 setup_args = {
-	'name':         'polyFit',
+	'name':         'fitcal',
 	'author':       'Chuneeta Nunhokee',
-	'url':          'https://github.com/Chuneeta/polyFit',
+	'url':          'https://github.com/Chuneeta/fitcal',
 	'license':      'BSD',
 	'version':      version.version,
-	'description':  'MWA Calibration Polynomial Fitting',
-	'packages':     ['polyFit'],
-	'package_dir':  {'polyFit': 'polyFit'},
-	'package_data': {'polyFit': data_files},
+	'description':  'Fitting of calibration solutions',
+	'packages':     ['fitcal'],
+	'package_dir':  {'fitcal': 'fitcal'},
+	'package_data': {'fitcal': data_files},
 	'install_requires': ['numpy>=1.16.5','matplotlib>=2.2', 'pytest'],
 	'include_package_data': True,
 	'zip_safe':     False,
-	'scripts': ['scripts/run_polyfit.py']
+	'scripts': ['scripts/run_fitting.py']
 }
 
 if __name__ == '__main__':

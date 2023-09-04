@@ -1,4 +1,4 @@
 """
-__init__.py filr from polyFit
+__init__.py filr from fitcal
 """
-from polyFit import fitting
+from fitcal import gain_fitting, phase_fitting, amplitude_fitting

@@ -136,7 +136,7 @@ class HyperSolnFits(object):
         # plot yy polarizations
         fig, axs = pylab.subplots(nrows, ncols, figsize=(
             16, 9), sharex=True, sharey='row', squeeze=True)
-        pylab.suptitle('Calibration solutions -- YY', size=7)
+        pylab.suptitle('Phase', size=7)
         for id, t_id in enumerate(self.tile_ids):
             ax = pylab.subplot(nrows, ncols, id + 1)
             ax.scatter(self.frequencies * 1e-6,

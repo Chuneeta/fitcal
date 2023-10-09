@@ -21,7 +21,7 @@ def package_files(package_dir, subdirectory):
 	return paths
 
 
-data_files = package_files('polyFit', 'data')
+data_files = package_files('fitcal', 'data')
 
 setup_args = {
 	'name':         'fitcal',

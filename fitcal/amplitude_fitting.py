@@ -9,6 +9,7 @@ import pylab
 # Number of coarse bands
 Nband = 24
 polstrs = ['XX', 'XY', 'YX', 'YY']
+poldict = {'XX': 0, 'XY': 1, 'YX': 2, 'YY': 3}
 
 
 class Amplitude_Fit(object):
@@ -32,7 +33,7 @@ class Amplitude_Fit(object):
         self.npols = self.gain_array.shape[-1]
         self.nfreq = len(self.frequencies)
 
-    def quality_metrics(self, observed, expected):
+    def quality_metrics(self, observed, expected, order):
         """
         Metrics for the goodness of fit
 
@@ -51,19 +52,33 @@ class Amplitude_Fit(object):
                 chisq representing the goodness of fit
         """
 
-        residuals = observed - expected
-        mse = np.sum(np.abs(residuals)**2) / len(residuals)
-        std = residuals.std()
-        chisq = np.sum(np.abs(residuals)**2) / expected
+        def mean_square_error(y, yhat):
+            return np.nansum(y - yhat)**2 / len(yhat)
 
-        return {'mse': mse, 'std': std, 'chisq': chisq}
+        def calculate_aic(n, mse, num_params):
+            aic = n * np.log(mse) + 2 * num_params
+            return aic
+
+        def calculate_bic(n, mse, num_params):
+            bic = n * np.log(mse) + num_params * np.log(n)
+            return bic
+
+        def calculate_chisq(y, yhat):
+            return np.nansum(np.abs(observed - expected)**2 / expected)
+
+        mse = mean_square_error(observed, expected)
+        aic = calculate_aic(len(observed), mse, order)
+        bic = calculate_bic(len(observed), mse, order)
+        chisq = calculate_chisq(observed, expected)
+
+        return {'mse': mse, 'aic': aic, 'bic': bic, 'chisq': chisq}
 
     def _polynomial_filter(self, data_x, data_y, order, weights):
         """
         Fitting a polynomial of desried order
 
         Parameters
-        data_x : ndarray
+        data_x : ndarrays
                          1-d array consiting of values for the corresponsing data to be fitted
         data_y : ndarrray
                          1-d array consting of values to be fitted. Shoudl be of same length as data_x
@@ -115,6 +130,7 @@ class Amplitude_Fit(object):
         """
 
         poly_array = copy.deepcopy(self.gain_array)
+        quality_metrics = {}
 
         for t in range(self.ntime):
             # filter any channels where result is NaN
@@ -128,7 +144,9 @@ class Amplitude_Fit(object):
                         good_chs, np.abs(self.gain_array[t, ant, good_chs, pol]), order=order, weights=weigths)
                     poly_array[t, ant, good_chs, pol] = fit_data(good_chs)
 
-        quality_metrics = self.quality_metrics(self.gain_array, poly_array)
+        for p in polstrs:
+            quality_metrics[p] = self.quality_metrics(
+                self.gain_array[:, :, :, poldict[p]], poly_array[:, :, :, poldict[p]], order)
 
         return poly_array, quality_metrics
 
@@ -150,6 +168,8 @@ class Amplitude_Fit(object):
         """
 
         smoothed_array = copy.deepcopy(self.gain_array)
+        quality_metrics = {}
+
         for t in range(self.ntime):
             # filter any channels where result is NaN
             good_chs = np.where(~np.isnan(self.convergence[0]))[0]
@@ -162,7 +182,9 @@ class Amplitude_Fit(object):
                                                       window=window)
                     smoothed_array[t, ant, good_chs, pol] = smooth_data
 
-        quality_metrics = self.quality_metrics(self.gain_array, smoothed_array)
+        for p in polstrs:
+            quality_metrics[p] = self.quality_metrics(
+                np.abs(self.gain_array[:, :, :, poldict[p]]), np.abs(smoothed_array[:, :, :, poldict[p]]), order)
 
         return smoothed_array, quality_metrics
 

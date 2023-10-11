@@ -24,6 +24,20 @@ class HyperSolnFits(object):
         self.frequencies = self.cal.frequency_array
         self.gain_array = self.cal.gain_array
 
+    def create_ampqa_dict(self, amp_qa):
+        for p in ['XX', 'YY']:
+            self.qa['AIC_AMP{}'.format(p)] = amp_qa[p]['aic']
+            self.qa['BIC_AMP{}'.format(p)] = amp_qa[p]['bic']
+            self.qa['MSE_AMP{}'.format(p)] = amp_qa[p]['mse']
+            self.qa['CHISQ_AMP{}'.format(p)] = amp_qa[p]['chisq']
+
+    def create_phsqa_dict(self, phase_qa):
+        for p in ['XX', 'YY']:
+            self.qa['STDERR_PHS{}'.format(p)] = np.nanmean(
+                phase_qa[p]['stderr'])
+            self.qa['QUALITY_PHS{}'.format(p)] = np.nanmean(
+                phase_qa[p]['quality'])
+
     def get_fitted_solutions(self, order=3, window=99, weights=None, fit_amplitude=False, fit_phase=False):
         """s
         Get the fitted amplitude and phase of the gain solutions
@@ -46,29 +60,36 @@ class HyperSolnFits(object):
                 If set to False, raw phases will be used. Default is True.
         """
 
+        # dictionary to save the quality metrics of the fit
+        self.qa = {}
         # smoothing the amplpitude
         if ((fit_amplitude is True) and (fit_phase is False)):
-            print('Amp yES')
+            print('Smoothing amplitude of calibration solutions ...')
             famp = amplitude_fitting.Amplitude_Fit(self.calfits)
             fitted_amp, amp_qa = famp.savgol_smoothing(order, window)
             fitted_phase = self.cal.phases
+            self.create_ampqa_dict(amp_qa)
 
         # fitting line to the phases
         elif ((fit_amplitude is False) and (fit_phase is True)):
-            print('Phase yES')
+            print('Fitting phase of calibration solutions ...')
             fphs = phase_fitting.Phase_Fit(self.calfits)
             fitted_phase, phase_qa = fphs.phase_fit_line(self.calfits)
             fitted_amp = self.cal.amplitudes
+            self.create_phsqa_dict(phase_qa)
 
         # fitting both amplitude and phaase
         elif ((fit_amplitude is True) and (fit_phase is True)):
+            print('Smoothing amplitude of calibration solutions ...')
             famp = amplitude_fitting.Amplitude_Fit(self.calfits)
             fitted_amp, amp_qa = famp.savgol_smoothing(order, window)
+            print('Fitting phase of calibration solutions ...')
             fphs = phase_fitting.Phase_Fit(self.calfits)
             fitted_phase, phase_qa = fphs.phase_fit_line(self.calfits)
+            self.create_ampqa_dict(amp_qa)
+            self.create_phsqa_dict(phase_qa)
 
         else:
-            print('Both yES')
             fitted_amp = self.cal.amplitudes
             fitted_phase = self.cal.phases
 
@@ -96,6 +117,12 @@ class HyperSolnFits(object):
                 hdus.writeto(outfile, overwrite=overwrite)
         except AttributeError:
             print('Fit Object has no fitting attribute. Fitting of the data is required. No file is being written.')
+
+        # adding qulaity metrics to the header
+        with fits.open(outfile, 'update') as hdu:
+            header = hdu['SOLUTIONS'].header
+            for key in self.qa.keys():
+                header[key] = self.qa[key]
 
     def plot_solutions(self, figure_name=None):
         """

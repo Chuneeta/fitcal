@@ -9,7 +9,7 @@ Another useful information is to the goodness of fit which would give a quality 
 
 ## Installation
 Clone the repo using   
-`git clone https://github.com/Chuneeta/calfit.git`   
-`cd calfit`   
+`git clone https://github.com/Chuneeta/fitcal.git`   
+`cd fitcal`   
 `python setup.py install`  
 
